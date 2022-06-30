@@ -1,0 +1,11 @@
+-- list direcoties names in current path
+local lfs = require"lfs"
+local root = "/Users/raza/.config/nvim/lua/"
+for dir in lfs.dir(root) do
+    if dir~="." and dir~=".." then
+      print("dir => " .. dir)
+	require("lua."..dir ..".use")
+    end
+end
+
+

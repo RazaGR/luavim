@@ -1,0 +1,3 @@
+local use=...
+use "github/copilot.vim"
+
