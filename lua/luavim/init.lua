@@ -29,6 +29,14 @@ packer.init {
     end,
   },
 }
+
+local function utils_Set(list)
+    local set = {}
+    for _, l in ipairs(list) do set[l] = true end
+    return set
+end
+local _plugins_set = utils_Set(plugins)
+
 -- Start packer
 return packer.startup(function(use)
   -- default plugins
@@ -46,10 +54,24 @@ return packer.startup(function(use)
 
   -- Load plugins use 
   for i = 1, #plugins do
-    local load = assert(loadfile(vim.fn.getcwd().."/lua/luavim/"..plugins[i] .."/use.lua"))
+    --local load = assert(loadfile(vim.fn.getcwd().."/lua/luavim/"..plugins[i] .."/use.lua"))
+    local config_path = vim.fn.stdpath "config" .. "/lua/luavim/" .. plugins[i] .. "/use.lua"
+    local load = assert(loadfile(config_path))
     load(use)
   end
 
+  local fd = vim.loop.fs_scandir(vim.fn.stdpath "config" .."/lua/luavim")
+	while true do
+	  local name, typ = vim.loop.fs_scandir_next(fd)
+	  if name == nil then
+		  break
+	  end
+	  if typ == "directory" and not _plugins_set[name] then
+      -- add name to plugins list
+	   plugins[#plugins + 1] = name
+      print(name)
+    end
+	end
   -- Load plugins configuration
   for i = 1, #plugins do
     require("luavim."..plugins[i] )
